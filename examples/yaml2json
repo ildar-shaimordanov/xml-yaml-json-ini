@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+perl -x -S xyji.pl --from=yaml --to=json "$@"
