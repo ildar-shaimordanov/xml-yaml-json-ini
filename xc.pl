@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-xyji - Converter between XML, YAML, JSON formats
+xc - cross-language converter for any of XML, YAML, JSON and INI formats.
 
 =head1 SYNOPSIS
 

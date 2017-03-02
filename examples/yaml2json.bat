@@ -1,2 +1,2 @@
 @echo off
-perl -x -S xyji.pl --from=yaml --to=json %*
+perl -x -S xc.pl --from=yaml --to=json %*
