@@ -1,2 +1,2 @@
 # xml-yaml-json-ini
-Converter between XML, YAML, JSON formats
+cross-language converter for any of XML, YAML, JSON and INI formats.
