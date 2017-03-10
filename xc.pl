@@ -6,7 +6,7 @@ xc - cross-language converter for any of XML, YAML, JSON and INI formats.
 
 =head1 SYNOPSIS
 
-    jyx OPTIONS
+    xc OPTIONS
 
 =head1 DESCRIPTION
 
