@@ -10,7 +10,54 @@ xc - cross-language converter for any of XML, YAML, JSON and INI formats.
 
 =head1 DESCRIPTION
 
+xc is a command line tool to convert data between XML, YAML, JSON and INI 
+formats. 
+
 =head1 OPTIONS
+
+=over 10
+
+=item B<--help>, B<-h>
+
+Outputs this help page.
+
+=item B<--from=FORMAT>, B<-f FORMAT>, B<-r FORMAT>
+
+Assumes the input file has the specified format.
+
+=item B<--to=FORMAT>, B<-t FORMAT>, B<-w FORMAT>
+
+Assumes the output file has the specified format.
+
+=item B<--sort>
+
+Sort output.
+
+=item B<--indent>
+
+Indent output.
+
+=item B<--indent-size=SIZE>
+
+Indentation size.
+
+=item B<--attr-indent>
+
+Indent XML attributes.
+
+=item B<--skip-empty>
+
+Skip empty fields.
+
+=item B<--raw>
+
+Avoid formatting.
+
+=item B<--xml-decl[=DECL]>
+
+Output XML declaration.
+
+=back
 
 =head1 SEE ALSO
 
