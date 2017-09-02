@@ -104,7 +104,7 @@ my %opts;
 sub set_format {
 	my ( $name, $k, $v ) = ( shift, shift, lc shift );
 	die "$ME: Unknown $name: $v\n" 
-		unless $v =~ m/^( xml | yaml | json $)/x;
+		unless $v =~ m/^( xml | yaml | json )$/x;
 	$opts{$k} = $v;
 }
 
