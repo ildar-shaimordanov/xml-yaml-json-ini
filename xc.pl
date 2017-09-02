@@ -57,6 +57,11 @@ Avoid formatting.
 
 Output XML declaration.
 
+=item B<--default=SECTION>
+
+Specifies a section to be used for default values for parameters outside a 
+section. 
+
 =back
 
 =head1 SEE ALSO
@@ -66,6 +71,8 @@ L<JSON>, L<JSON::XS>, L<JSON::PP>
 L<YAML::Tiny>
 
 L<XML::Simple>
+
+L<Config::IniFiles>
 
 =head1 COPYRIGHT
 
@@ -81,6 +88,7 @@ use XML::Simple;
 $XML::Simple::PREFERRED_PARSER = 'XML::Parser';
 use YAML::Tiny;
 use JSON -support_by_pp;
+use Config::IniFiles;
 
 use Data::Dumper;
 use Pod::Usage;
@@ -104,7 +112,7 @@ my %opts;
 sub set_format {
 	my ( $name, $k, $v ) = ( shift, shift, lc shift );
 	die "$ME: Unknown $name: $v\n" 
-		unless $v =~ m/^( xml | yaml | json )$/x;
+		unless $v =~ m/^( xml | yaml | json | ini )$/x;
 	$opts{$k} = $v;
 }
 
@@ -129,6 +137,7 @@ pod2usage unless GetOptions(
 	'xml-decl:s' => sub {
 		$opts{xml_decl} = $_[1] || 1;
 	}, 
+	'default=s' => \$opts{default}, 
 ) 
 and defined $opts{from} 
 and defined $opts{to} 
@@ -136,7 +145,7 @@ and defined $opts{to}
 
 # =========================================================================
 
-my $in = join "", <>;
+my $in = join "", <> unless $opts{from} eq "ini";
 
 # =========================================================================
 
@@ -162,6 +171,22 @@ for ( $opts{from} ) {
 	});
 	last;
 };
+/ini/ and do {
+	tie my %ini, "Config::IniFiles", (
+#		-file => \*STDIN, 
+		-file => $ARGV[0],
+		-default => $opts{default}, 
+		-fallback => $opts{default}, 
+		-nocase => 0, 
+		-allowcontinue => 0, 
+		-allowempty => 0, 
+		-reloadwarn => 0, 
+		-nomultiline => 1, 
+		-handle_trailing_comment => 0,
+	);
+	$data = \%ini;
+	last;
+}
 }
 
 # =========================================================================
@@ -192,11 +217,28 @@ for ( $opts{to} ) {
 	});
 	last;
 };
+/ini/ and do {
+	tie my %ini, "Config::IniFiles", (
+#		-file => \*STDIN, 
+		-default => $opts{default}, 
+		-fallback => $opts{default}, 
+		-nocase => 0, 
+		-allowcontinue => 0, 
+		-allowempty => 0, 
+		-reloadwarn => 0, 
+		-nomultiline => 1, 
+		-handle_trailing_comment => 0,
+	);
+	%ini = %{ $data };
+	tied( %ini )->OutputConfig();
+#	tied( %{ $data } )->OutputConfig();
+	last;
+}
 }
 
 # =========================================================================
 
-print $out;
+print $out unless $opts{to} eq "ini";
 
 # =========================================================================
 

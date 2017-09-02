@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+perl -x -S xc.pl --from=ini --to=xml "$@"
