@@ -42,6 +42,10 @@ OPTIONS
     --xml-decl[=DECL]
               Output XML declaration.
 
+    --default=SECTION
+              Specifies a section to be used for default values for
+              parameters outside a section.
+
 SEE ALSO
     JSON, JSON::XS, JSON::PP
 
@@ -49,10 +53,11 @@ SEE ALSO
 
     XML::Simple
 
+    Config::IniFiles
+
 COPYRIGHT
     Copyright 2017 Ildar Shaimordanov <ildar.shaimordanov@gmail.com>
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
-
 ```
