@@ -4,12 +4,13 @@ cross-language converter for any of XML, YAML/YML, JSON and INI formats.
 
 ## Dependencies
 
-* Config::IniFiles
-* JSON
-* XML::Simple
-  * XML::SAX
-  * XML::SAX::Base
-  * XML::NamespaceSupport
+* [Config::IniFiles](https://metacpan.org/pod/Config::IniFiles)
+* [JSON](https://metacpan.org/pod/JSON)
+* [XML::Simple](https://metacpan.org/pod/XML::Simple)
+  * [XML::SAX](https://metacpan.org/pod/XML::SAX)
+  * [XML::SAX::Base](https://metacpan.org/pod/XML::SAX::Base)
+  * [XML::NamespaceSupport](https://metacpan.org/pod/XML::NamespaceSupport)
+* [YAML::Tiny](https://metacpan.org/pod/YAML::Tiny)
 
 ## Presetting
 
