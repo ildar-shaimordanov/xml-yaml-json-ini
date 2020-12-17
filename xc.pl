@@ -10,7 +10,7 @@ xc - cross-language converter for any of XML, YAML, JSON and INI formats.
 
 =head1 DESCRIPTION
 
-xc is a command line tool to convert data between XML, YAML, JSON and INI formats.
+xc is a naive command line tool to convert data between XML, YAML, JSON and INI formats.
 
 =head1 OPTIONS
 
