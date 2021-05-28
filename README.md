@@ -51,29 +51,25 @@ OPTIONS
         format.
 
     --sort
-        Sort output.
+        Sort output (XML and JSON only).
 
-    --indent
-        Indent output.
-
-    --indent-size=SIZE
-        Indentation size.
-
-    --attr-indent
-        Indent XML attributes.
+    --pretty
+        Beautify the output.
 
     --skip-empty
-        Skip empty fields.
+        Skip empty fields when parsing and displaying XML.
 
     --raw
-        Avoid formatting.
+        Make JSON parsing more permissive (enable an end-comma after a last
+        item; shell-style comments and C-style comments; allow bare keys and
+        single quotes).
 
     --xml-decl[=DECL]
         Output XML declaration.
 
     --default=SECTION
-        Specifies a section to be used for default values for parameters
-        outside a section.
+        Specifies a section for INI files to be used for default values for
+        parameters outside a section.
 
 FORMATS
     The following formats are supported:
