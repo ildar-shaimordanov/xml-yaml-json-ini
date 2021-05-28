@@ -158,30 +158,29 @@ and defined $opts{to}
 
 # =========================================================================
 
-my $in;
+my $text;
 my $data;
-my $out;
 
 # =========================================================================
 
-$in = join '', <> unless $opts{from} eq 'ini';
+$text = do { undef $/; <> };
 
 # =========================================================================
 
 for ( $opts{from} ) {
 /xml/ and do {
-	$data = XMLin($in, 
+	$data = XMLin($text,
 		KeepRoot	=> 1,
 		SuppressEmpty	=> $opts{skip_empty},
 	);
 	last;
 };
 /ya?ml/ and do {
-	$data = Load($in);
+	$data = Load($text);
 	last;
 };
 /json/ and do {
-	$data = from_json($in, {
+	$data = from_json($text, {
 		allow_barekey	=> $opts{raw},
 		allow_singlequote => $opts{raw},
 		relaxed		=> $opts{raw},
@@ -190,8 +189,7 @@ for ( $opts{from} ) {
 };
 /ini/ and do {
 	tie my %ini, 'Config::IniFiles', (
-#		-file		=> \*STDIN,
-		-file		=> $ARGV[0] || '-',
+		-file		=> \$text,
 		-default	=> $opts{default},
 		-fallback	=> $opts{default},
 		-nocase		=> 0,
@@ -210,7 +208,7 @@ for ( $opts{from} ) {
 
 for ( $opts{to} ) {
 /xml/ and do {
-	$out = XMLout($data, 
+	$text = XMLout($data,
 		KeepRoot	=> 1,
 		NoSort		=> ! $opts{sort},
 		NoIndent	=> ! $opts{indent},
@@ -221,11 +219,11 @@ for ( $opts{to} ) {
 	last;
 };
 /ya?ml/ and do {
-	$out = Dump($data);
+	$text = Dump($data);
 	last;
 };
 /json/ and do {
-	$out = to_json($data, {
+	$text = to_json($data, {
 		pretty		=> $opts{indent},
 		indent_length	=> $opts{indent_size} || 2,
 		canonical	=> $opts{sort},
@@ -234,7 +232,6 @@ for ( $opts{to} ) {
 };
 /ini/ and do {
 	tie my %ini, 'Config::IniFiles', (
-#		-file		=> \*STDIN,
 		-default	=> $opts{default},
 		-fallback	=> $opts{default},
 		-nocase		=> 0,
@@ -246,14 +243,13 @@ for ( $opts{to} ) {
 	);
 	%ini = %{ $data };
 	tied( %ini )->OutputConfig();
-#	tied( %{ $data } )->OutputConfig();
 	last;
 }
 }
 
 # =========================================================================
 
-print $out unless $opts{to} eq 'ini';
+print $text unless $opts{to} eq 'ini';
 
 # =========================================================================
 
