@@ -1,2 +1,2 @@
 @echo off
-perl -x -S xc.pl --from=xml --to=json %*
+perl -I inc ../xc.pl --from=xml --to=json %*
