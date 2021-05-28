@@ -32,27 +32,19 @@ The mandatory option assumes the output file has the specified format.
 
 =item B<--sort>
 
-Sort output.
+Sort output (XML and JSON only).
 
-=item B<--indent>
+=item B<--pretty>
 
-Indent output.
-
-=item B<--indent-size=SIZE>
-
-Indentation size.
-
-=item B<--attr-indent>
-
-Indent XML attributes.
+Beautify the output.
 
 =item B<--skip-empty>
 
-Skip empty fields.
+Skip empty fields when parsing and displaying XML.
 
 =item B<--raw>
 
-Avoid formatting.
+Make JSON parsing more permissive (enable an end-comma after a last item; shell-style comments and C-style comments; allow bare keys and single quotes).
 
 =item B<--xml-decl[=DECL]>
 
@@ -60,7 +52,7 @@ Output XML declaration.
 
 =item B<--default=SECTION>
 
-Specifies a section to be used for default values for parameters outside a section.
+Specifies a section for INI files to be used for default values for parameters outside a section.
 
 =back
 
@@ -144,9 +136,7 @@ pod2usage unless GetOptions(
 	'to|t|w=s'	=> sub { set_format 'writer', @_; },
 
 	'sort'		=> \$opts{sort},
-	'indent'	=> \$opts{indent},
-	'indent-size=i'	=> \$opts{indent_size},
-	'attr-indent'	=> \$opts{attr_indent},
+	'pretty'	=> \$opts{pretty},
 	'skip-empty'	=> \$opts{skip_empty},
 	'raw'		=> \$opts{raw},
 	'xml-decl:s'	=> sub { $opts{xml_decl} = $_[1] || 1; },
@@ -211,8 +201,8 @@ for ( $opts{to} ) {
 	$text = XMLout($data,
 		KeepRoot	=> 1,
 		NoSort		=> ! $opts{sort},
-		NoIndent	=> ! $opts{indent},
-		AttrIndent	=> $opts{attr_indent},
+		NoIndent	=> ! $opts{pretty},
+		AttrIndent	=> $opts{pretty},
 		SuppressEmpty	=> $opts{skip_empty},
 		XMLDecl		=> $opts{xml_decl},
 	);
@@ -224,8 +214,7 @@ for ( $opts{to} ) {
 };
 /json/ and do {
 	$text = to_json($data, {
-		pretty		=> $opts{indent},
-		indent_length	=> $opts{indent_size} || 2,
+		pretty		=> $opts{pretty},
 		canonical	=> $opts{sort},
 	});
 	last;
