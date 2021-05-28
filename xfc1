@@ -1,0 +1,309 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+xfc - cross format converter for any of XML, YAML, JSON and INI formats.
+
+=head1 SYNOPSIS
+
+    xfc -f FORMAT -t FORMAT [OPTIONS]
+    xfc -r FORMAT -w FORMAT [OPTIONS]
+    xfc --from=FORMAT --to=FORMAT [OPTIONS]
+
+=head1 DESCRIPTION
+
+xfc is a naive command line tool to convert data between XML, YAML, JSON and INI formats.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Outputs this help page.
+
+=item B<-r FORMAT>, B<-f FORMAT>, B<--from=FORMAT>
+
+The mandatory option assumes the input file has the specified format.
+
+=item B<-w FORMAT>, B<-t FORMAT>, B<--to=FORMAT>
+
+The mandatory option assumes the output file has the specified format.
+
+=back
+
+=head1 FORMATS
+
+The following formats are supported:
+
+=over 4
+
+=item B<INI>
+
+=item B<JSON>
+
+=item B<XML>
+
+=item B<YAML> (B<YML> is allowed as shortcut)
+
+=back
+
+=head1 SEE ALSO
+
+=head1 COPYRIGHT
+
+Copyright 2017, 2020, 2021 Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
+
+    MIT
+
+=cut
+
+# =========================================================================
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+
+# =========================================================================
+
+my %opts;
+
+my $io;
+
+sub set_format {
+	my ( $name, $k, $v ) = @_;
+
+	die "Unknown $name: $v\n"
+	unless $v =~ m/^( xml | ya?ml | json | ini )$/x;
+
+	$v = uc $v;
+	$v =~ s/YML/YAML/;
+
+	$io->{$name} = "Local::$v";
+}
+
+pod2usage unless 
+GetOptions(
+	'h|help'	=> sub { pod2usage({ -verbose => 2, -noperldoc => 1 }); },
+
+	'r|f|from=s'	=> sub { set_format('reader', @_); },
+	'w|t|to=s'	=> sub { set_format('writer', @_); },
+)
+&& defined $io->{reader}
+&& defined $io->{writer}
+;
+
+die "-f/-r/--from option required\n" unless $io->{reader};
+die "-t/-w/--to option required\n" unless $io->{writer};
+
+# =========================================================================
+
+my $text;
+my $data;
+
+# =========================================================================
+
+$text = do { undef $/; <> };
+$data = $io->{reader}->load($text);
+$text = $io->{writer}->dump($data);
+print $text;
+
+# =========================================================================
+
+{
+
+package Local::Module::Find;
+
+use List::Util qw( first );
+
+our $DEBUG;
+our $FATAL;
+
+BEGIN {
+	$FATAL = 1;
+}
+
+sub findfirst {
+	shift if $_[0] eq __PACKAGE__ || ref $_[0] eq __PACKAGE__;
+
+	my $pkg = first {
+		my $pkg = eval "require $_; '$_'";
+		warn "$@" if $DEBUG && $@;
+		$pkg;
+	} @_;
+
+	die "Unable to load any of the list: @_\n" if ! $pkg && $FATAL;
+
+	warn "Found: $pkg\n" if $DEBUG;
+
+	$pkg;
+}
+
+};
+
+# =========================================================================
+
+{
+
+package Local::INI;
+
+# Borrowed from Config::Tiny
+
+sub load {
+	my ( $self, $text, $opts ) = @_;
+
+	return undef unless defined $text;
+
+	my $data;
+
+	my $ns = $opts{default} || '_';
+	my $counter = 0;
+
+	foreach ( split /(?:\015{1,2}\012|\015|\012)/, $text ) {
+		$counter++;
+
+		# Skip comments and empty lines.
+ 		next if /^\s*(?:\#|\;|$)/;
+ 
+		# Remove inline comments.
+ 		s/\s\;\s.+$//g;
+ 
+		# Handle section headers.
+		if ( /^\s*\[\s*(.+?)\s*\]\s*$/ ) {
+	 		# Create the sub-hash if it doesn't exist.
+	 		# Without this sections without keys will not
+	 		# appear at all in the completed struct.
+	 		$data->{$ns = $1} ||= {};
+	 		next;
+		}
+ 
+		# Handle properties.
+		if ( /^\s*([^=]+?)\s*=\s*(.*?)\s*$/ ) {
+	 		$data->{$ns}->{$1} = $2;
+ 	 		next;
+		}
+
+		die "Syntax error at line $counter: '$_'\n";
+	}
+
+	return $data;
+}
+
+sub dump {
+	my ( $self, $data, $opts ) = @_;
+
+	my $text = '';
+
+	my $ns = $opts{default} || '_';
+
+	for my $section ( sort {
+		(($b eq $ns) <=> ($a eq $ns)) || ($a cmp $b) 
+	} keys %$data ) {
+		# Check for several known-bad situations with the section
+		# 1. Leading whitespace
+		# 2. Trailing whitespace
+		# 3. Newlines in section name.
+		die "Illegal whitespace in section name '$section'\n"
+		if $section =~ /(?:^\s|\n|\s$)/s;
+
+		my $block = $data->{$section};
+		$text .= "\n" if length $text;
+		$text .= "[$section]\n" unless $section eq $ns;
+
+		for my $property ( sort keys %$block ) {
+	 		die "Illegal newlines in property '$section.$property'\n"
+	 		if $block->{$property} =~ /(?:\012|\015)/s;
+
+	 		$text .= "$property=$block->{$property}\n";
+		}
+	}
+
+	return $text;
+}
+
+};
+
+# =========================================================================
+
+{
+
+package Local::JSON;
+
+use JSON -support_by_pp;
+
+sub load {
+	my ( $self, $text, $opts ) = @_;
+	from_json($text, {
+		allow_barekey	=> $opts{raw},
+		allow_singlequote => $opts{raw},
+		relaxed		=> $opts{raw},
+	});
+}
+
+sub dump {
+	my ( $self, $data, $opts ) = @_;
+	to_json($data, {
+		pretty		=> $opts{pretty},
+		canonical	=> $opts{sort},
+	});
+}
+
+};
+
+# =========================================================================
+
+{
+
+package Local::XML;
+
+use XML::Simple;
+$XML::Simple::PREFERRED_PARSER = 'XML::SAX::PurePerl';
+#$XML::Simple::PREFERRED_PARSER = 'XML::Parser';
+
+sub load {
+	my ( $self, $text, $opts ) = @_;
+	XMLin($text,
+		KeepRoot	=> 1,
+		SuppressEmpty	=> $opts{skip_empty},
+	);
+}
+
+sub dump {
+	my ( $self, $data, $opts ) = @_;
+	XMLout($data,
+		KeepRoot	=> 1,
+		NoSort		=> ! $opts{sort},
+		NoIndent	=> ! $opts{pretty},
+		AttrIndent	=> $opts{pretty},
+		SuppressEmpty	=> $opts{skip_empty},
+		XMLDecl		=> $opts{xml_decl},
+	);
+}
+
+};
+
+# =========================================================================
+
+{
+
+package Local::YAML;
+
+use YAML::Tiny;
+
+sub load {
+	my ( $self, $text, $opts ) = @_;
+	Load($text);
+}
+
+sub dump {
+	my ( $self, $data, $opts ) = @_;
+	Dump($data);
+}
+
+};
+
+# =========================================================================
+
+# EOF
