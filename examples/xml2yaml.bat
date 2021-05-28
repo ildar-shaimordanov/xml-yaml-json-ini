@@ -1,2 +1,2 @@
 @echo off
-perl -I inc ../xc.pl --from=xml --to=yaml %*
+perl -I ../inc ../xc.pl --from=xml --to=yaml %*

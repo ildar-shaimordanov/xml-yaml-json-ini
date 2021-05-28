@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-perl -I inc ../xc.pl --from=json --to=xml "$@"
+perl -I ../inc ../xc.pl --from=json --to=xml "$@"
