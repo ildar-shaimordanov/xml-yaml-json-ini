@@ -86,7 +86,7 @@ L<Config::IniFiles>
 
 Copyright 2017, 2020, 2021 Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
 
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+    MIT
 
 =cut
 
