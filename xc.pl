@@ -2,11 +2,13 @@
 
 =head1 NAME
 
-xc - cross-language converter for any of XML, YAML, JSON and INI formats.
+xc - cross format converter for any of XML, YAML, JSON and INI formats.
 
 =head1 SYNOPSIS
 
-    xc OPTIONS
+    xc -f FORMAT -t FORMAT [OPTIONS]
+    xc -r FORMAT -w FORMAT [OPTIONS]
+    xc --from=FORMAT --to=FORMAT [OPTIONS]
 
 =head1 DESCRIPTION
 
@@ -16,17 +18,17 @@ xc is a naive command line tool to convert data between XML, YAML, JSON and INI 
 
 =over 4
 
-=item B<--help>, B<-h>
+=item B<-h>, B<--help>
 
 Outputs this help page.
 
-=item B<--from=FORMAT>, B<-f FORMAT>, B<-r FORMAT>
+=item B<-r FORMAT>, B<-f FORMAT>, B<--from=FORMAT>
 
-Assumes the input file has the specified format.
+The mandatory option assumes the input file has the specified format.
 
-=item B<--to=FORMAT>, B<-t FORMAT>, B<-w FORMAT>
+=item B<-w FORMAT>, B<-t FORMAT>, B<--to=FORMAT>
 
-Assumes the output file has the specified format.
+The mandatory option assumes the output file has the specified format.
 
 =item B<--sort>
 
@@ -64,15 +66,17 @@ Specifies a section to be used for default values for parameters outside a secti
 
 =head1 FORMATS
 
+The following formats are supported:
+
 =over 4
 
-=item B<ini>
+=item B<INI>
 
-=item B<json>
+=item B<JSON>
 
-=item B<xml>
+=item B<XML>
 
-=item B<yaml>, B<yml>
+=item B<YAML> (B<YML> is allowed as shortcut)
 
 =back
 
@@ -88,7 +92,7 @@ L<Config::IniFiles>
 
 =head1 COPYRIGHT
 
-Copyright 2017, 2020 Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
+Copyright 2017, 2020, 2021 Ildar Shaimordanov E<lt>F<ildar.shaimordanov@gmail.com>E<gt>
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
