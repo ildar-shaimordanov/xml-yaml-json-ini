@@ -112,41 +112,6 @@ print $text;
 
 # =========================================================================
 
-{
-
-package Local::Module::Find;
-
-use List::Util qw( first );
-
-our $DEBUG;
-our $FATAL;
-
-BEGIN {
-	$FATAL = 1;
-}
-
-sub findfirst {
-	shift if $_[0] eq __PACKAGE__ || ref $_[0] eq __PACKAGE__;
-
-	my $pkg = first {
-		my $pkg = eval "require $_; '$_'";
-		warn "$@" if $DEBUG && $@;
-		$pkg;
-	} @_;
-
-	die "Unable to load any of the list: @_\n" if ! $pkg && $FATAL;
-
-	warn "Found: $pkg\n" if $DEBUG;
-
-	$pkg;
-}
-
-};
-
-# =========================================================================
-
-{
-
 package Local::INI;
 
 # Borrowed from Config::Tiny
@@ -223,15 +188,11 @@ sub dump {
 	return $text;
 }
 
-};
-
 # =========================================================================
-
-{
 
 package Local::JSON;
 
-my $pkg;
+our $pkg;
 
 sub load_pkg {
 	$pkg = Local::Module::Find::findfirst(
@@ -254,15 +215,11 @@ sub dump {
 	encode_json($data);
 }
 
-};
-
 # =========================================================================
-
-{
 
 package Local::XML;
 
-my $pkg;
+our $pkg;
 
 sub load_pkg {
 #	local $Local::Module::Find::FATAL = 0;
@@ -302,15 +259,11 @@ sub dump {
 	}
 }
 
-};
-
 # =========================================================================
-
-{
 
 package Local::YAML;
 
-my $pkg;
+our $pkg;
 
 sub load_pkg {
 	$pkg = Local::Module::Find::findfirst(
@@ -333,7 +286,34 @@ sub dump {
 	Dump($data);
 }
 
-};
+# =========================================================================
+
+package Local::Module::Find;
+
+use List::Util qw( first );
+
+our $DEBUG;
+our $FATAL;
+
+BEGIN {
+	$FATAL = 1;
+}
+
+sub findfirst {
+	shift if $_[0] eq __PACKAGE__ || ref $_[0] eq __PACKAGE__;
+
+	my $pkg = first {
+		my $pkg = eval "require $_; '$_'";
+		warn "$@" if $DEBUG && $@;
+		$pkg;
+	} @_;
+
+	die "Unable to load any of the list: @_\n" if ! $pkg && $FATAL;
+
+	warn "Found: $pkg\n" if $DEBUG;
+
+	$pkg;
+}
 
 # =========================================================================
 

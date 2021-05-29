@@ -112,41 +112,6 @@ print $text;
 
 # =========================================================================
 
-{
-
-package Local::Module::Find;
-
-use List::Util qw( first );
-
-our $DEBUG;
-our $FATAL;
-
-BEGIN {
-	$FATAL = 1;
-}
-
-sub findfirst {
-	shift if $_[0] eq __PACKAGE__ || ref $_[0] eq __PACKAGE__;
-
-	my $pkg = first {
-		my $pkg = eval "require $_; '$_'";
-		warn "$@" if $DEBUG && $@;
-		$pkg;
-	} @_;
-
-	die "Unable to load any of the list: @_\n" if ! $pkg && $FATAL;
-
-	warn "Found: $pkg\n" if $DEBUG;
-
-	$pkg;
-}
-
-};
-
-# =========================================================================
-
-{
-
 package Local::INI;
 
 # Borrowed from Config::Tiny
@@ -223,11 +188,7 @@ sub dump {
 	return $text;
 }
 
-};
-
 # =========================================================================
-
-{
 
 package Local::JSON;
 
@@ -250,11 +211,7 @@ sub dump {
 	});
 }
 
-};
-
 # =========================================================================
-
-{
 
 package Local::XML;
 
@@ -282,11 +239,7 @@ sub dump {
 	);
 }
 
-};
-
 # =========================================================================
-
-{
 
 package Local::YAML;
 
@@ -302,7 +255,34 @@ sub dump {
 	Dump($data);
 }
 
-};
+# =========================================================================
+
+package Local::Module::Find;
+
+use List::Util qw( first );
+
+our $DEBUG;
+our $FATAL;
+
+BEGIN {
+	$FATAL = 1;
+}
+
+sub findfirst {
+	shift if $_[0] eq __PACKAGE__ || ref $_[0] eq __PACKAGE__;
+
+	my $pkg = first {
+		my $pkg = eval "require $_; '$_'";
+		warn "$@" if $DEBUG && $@;
+		$pkg;
+	} @_;
+
+	die "Unable to load any of the list: @_\n" if ! $pkg && $FATAL;
+
+	warn "Found: $pkg\n" if $DEBUG;
+
+	$pkg;
+}
 
 # =========================================================================
 
